@@ -14,9 +14,10 @@ export class News extends Component {
   }
 
   static propTypes = {
-    country : PropTypes.string,
+    country: PropTypes.string,
     pageSize: PropTypes.number,
-    category:PropTypes.string,
+    category: PropTypes.string,
+    setProgress: PropTypes.func.isRequired, // Ensure setProgress is passed as a function
   }
 
   capitalizeFirstLetter = (string) =>{
@@ -37,16 +38,20 @@ export class News extends Component {
 
   //As we deal with promises during fetching process, we use async function
   async fetchNews(){
+    this.props.setProgress(0);
     this.setState({loading:true});
     //let url = `https://newsapi.org/v2/top-headlines?q=trump&apiKey=${apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
     let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
     let data = await fetch(url);
+    this.props.setProgress(30);
     let parsedData = await data.json();
+    this.props.setProgress(40);
     this.setState({
       articles: this.state.page === 1 ? parsedData.articles : [...this.state.articles, ...parsedData.articles],
       totalResults: parsedData.totalResults,
       loading : false,
     });
+    this.props.setProgress(100);
   }
 
 //   The componentDidMount function is a lifecycle method in React that is invoked immediately after a component is mounted (inserted into the tree). This method is commonly used to perform tasks that require the DOM to be ready, such as:
