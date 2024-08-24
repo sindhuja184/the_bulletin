@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import NewsItem from './NewsItem';
 import Spinner from './Spinner';
 import PropTypes from 'prop-types'
+import InfiniteScroll from "react-infinite-scroll-component";
 export class News extends Component { 
 
 
@@ -42,7 +43,7 @@ export class News extends Component {
     let data = await fetch(url);
     let parsedData = await data.json();
     this.setState({
-      articles: parsedData.articles,
+      articles: this.state.page === 1 ? parsedData.articles : [...this.state.articles, ...parsedData.articles],
       totalResults: parsedData.totalResults,
       loading : false,
     });
@@ -64,56 +65,42 @@ export class News extends Component {
     }
     document.title = `${this.capitalizeFirstLetter(this.props.category)} - The Bulletin`;
   }
-  //this function handles the prevClick it changes the state of the page by subtracting 1 abd again calling the fetchNews function
-  handlePrevClick = async() => {
-    this.setState({
-      page: this.state.page -1
-    }, this.fetchNews);
-  }
-
-  //this function handles the next Click it changes the state of the page by subtracting 1 abd again calling the fetchNews function
-  handleNextClick = async() => {
-    if (this.state.page + 1 <= Math.ceil(this.state.totalResults / this.props.pageSize)) {
-      
-      this.setState({ page: this.state.page + 1, loading :true }, this.fetchNews);
-    }
-  }
+  fetchMoreData = () => {
+    this.setState(
+      (prevState) => ({ page: prevState.page + 1 }),
+      this.fetchNews
+    );
+  };
 
 
   render() {
     return (
       <div className = "container ">
         <h1 className='text-center' style={{marginBottom : 50}}>Top News-{this.capitalizeFirstLetter(this.props.category)}</h1>
-        {this.state.loading && <Spinner/>}
-        <div className = "row">
-            {!this.state.loading && this.state. articles.map((element) => {
-                return <div key = {element.url}  
-                        className = "col-md-4 my-2">
-                <NewsItem 
-                    title = {element.title?element.title:""}
-                    description = {element.description?element.description:""}
-                    imageUrl = {element.urlToImage}
-                    newsUrl = {element.url}
-                    author = {element.author}
-                    date = {element.publishedAt}
-                />
-                </div>
-            })}
-        </div> 
-        <div className = 'container d-flex justify-content-between'>
-            <button type="button" disabled = {this.state.page <= 1} className="btn btn-dark" onClick = {this.handlePrevClick}>&larr; Previous</button>
-            <button 
-                type="button" 
-                className="btn btn-dark" 
-                onClick={this.handleNextClick}
-                style={{ 
-                      backgroundColor: this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize) ? '#d3d3d3' : '#000000', 
-                      color: this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize) ? '#000000' : '#ffffff'
-                }}
-                disabled={this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize)}>
-                Next &rarr;
-            </button>
-        </div>
+        {/* {this.state.loading && <Spinner/>} */}
+        <InfiniteScroll
+          dataLength={this.state.articles.length}
+          next={this.fetchMoreData}
+          hasMore={this.state.articles.length < this.state.totalResults}
+          loader={<Spinner/>}
+        >
+          <div className = "row">
+              {this.state. articles.map((element) => {
+                  return <div key = {element.url}  
+                          className = "col-md-4 my-2">
+                  <NewsItem 
+                      title = {element.title?element.title:""}
+                      description = {element.description?element.description:""}
+                      imageUrl = {element.urlToImage}
+                      newsUrl = {element.url}
+                      author = {element.author}
+                      date = {element.publishedAt}
+                  />
+                  </div>
+              })}
+          </div> 
+        </InfiniteScroll>
+
       </div>
     );
   }
