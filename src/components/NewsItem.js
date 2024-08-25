@@ -1,9 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-export class NewsItem extends Component {
-  render() {
-    let { title, description, imageUrl, newsUrl, author, date} = this.props;
-
+const NewsItem = (props) => {
     // Fallback image URL
     let defaultImageUrl = "https://via.placeholder.com/150?text=No+Image+Available";
 
@@ -11,24 +8,23 @@ export class NewsItem extends Component {
       <div>
         <div className="card">
           <img 
-            src={imageUrl ? imageUrl : defaultImageUrl} 
+            src={props.imageUrl? props.imageUrl : defaultImageUrl} 
             className="card-img-top" 
             alt="News" 
           />
           <div className="card-body">
             <h5 className="card-title">
-              {title.length < 45 ? title : title.slice(0, 45) + "..."}
+              {props.title.length < 45 ? props.title : props.title.slice(0, 45) + "..."}
             </h5>
             <p className="card-text">
-              {description.length < 88 ? description : description.slice(0, 88) + "..."}
+              {props.description.length < 88 ? props.description : props.description.slice(0, 88) + "..."}
             </p>
-            <p className = "card-text"><small className = "text-muted">By {author} on {new Date(date).toGMTString()}</small></p>
-            <a href={newsUrl} className="btn btn-sm btn-primary">Read More</a>
+            <p className = "card-text"><small className = "text-muted">By {props.author} on {new Date(props.date).toGMTString()}</small></p>
+            <a href={props.newsUrl} className="btn btn-sm btn-primary">Read More</a>
           </div>
         </div>
       </div>
     );
-  }
 }
 
 export default NewsItem;
