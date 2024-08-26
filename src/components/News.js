@@ -51,15 +51,15 @@ const News = (props) => {
 
   return (
     <div className="container">
-      <h1 className='text-center' style={{ marginTop : 50, marginBottom: 50 }}>
+      <h1 className='text-center' style={{ marginTop : 50, marginBottom: 50, color : props.mode ==='light' ? 'black' : 'white'}}>
         Top News - {capitalizeFirstLetter(props.category)}
       </h1>
-      {loading && <Spinner />}
+      {loading && <Spinner mode = {props.mode}/>}
       <InfiniteScroll
         dataLength={articles ? articles.length:0}
         next={fetchMoreData}
         hasMore={articles.length < totalResults}
-        loader={<Spinner />}
+        loader={<Spinner mode = {props.mode}/>}
       >
         <div className="row">
           {articles.map((element) => (
@@ -71,6 +71,7 @@ const News = (props) => {
                 newsUrl={element.url}
                 author={element.author}
                 date={element.publishedAt}
+                mode = {props.mode}
               />
             </div>
           ))}
